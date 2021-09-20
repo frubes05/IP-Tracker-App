@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""
+    ></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rubik&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>IP Address Tracker</title>
+
+    <style>
+    
+      body {
+        margin: 0 auto;
+        height: 100vh;
+        display: grid;
+        grid-template-rows: repeat(8, 1fr);
+        font-family: "Rubik", sans-serif;
+      }
+
+      .search {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        grid-row-start: 1;
+        grid-row-end: 4;
+      }
+
+      .search__input {
+        position: relative;
+      }
+
+      .search__button {
+        position: absolute;
+        width: 50px;
+        right: 0px;
+        height: 100%;
+        border: none;
+        background-color: black;
+        border-radius: 0 10px 10px 0;
+        cursor: pointer;
+      }
+
+      .search__button:hover {
+        background-color: hsl(0, 0%, 59%);
+      }
+
+      h1 {
+        font-size: 40px;
+        color: white;
+      }
+
+      input:focus {
+        outline: none;
+      }
+
+      input {
+        width: 600px;
+        padding: 15px 10px;
+        border: none;
+        border-radius: 10px;
+        font-size: 18px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+
+      input::placeholder {
+        font-size: 18px;
+      }
+
+      .parameters {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .parameters__wrapper {
+        display: flex;
+        justify-content: space-around;
+        width: 60%;
+        position: absolute;
+        bottom: -100px;
+        z-index: 5;
+        background-color: white;
+        padding: 50px 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+
+      .parameters__div {
+        justify-self: center;
+        align-self: flex-start;
+        position: relative;
+        flex-grow: 1;
+        padding-left: 15px;
+      }
+
+      .parameters__div:not(:first-of-type){
+        border-left: 2px solid hsl(0, 0%, 59%);
+      }
+
+      .parameters__title {
+        margin: 0;
+        font-size: 16px;
+        color: hsl(0, 0%, 59%);
+      }
+
+      .parameters__text {
+        margin: 5px 0 0;
+        font-size: 20px;
+        color:hsl(0, 0%, 17%);
+      }
+
+    
+
+      #mapid {
+        grid-row: 2/9;
+        z-index: 0;
+      }
+
+      .wrapper {
+        position: relative;
+        background-image: url("images/pattern-bg.png");
+        background-repeat: no-repeat;
+        background-size: cover;
+        padding: 20px 0 100px;
+      }
+
+      @media (max-width:928px){
+
+        h1{
+          font-size: 30px;
+          margin-top: 0;
+        }
+
+        input{
+          width: 270px;
+        }
+
+        .parameters__wrapper{
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap:15px;
+          justify-content: center;
+          width: 55%;
+          bottom: -220px;
+          padding: 15px 15px;
+        }
+
+        .parameters__div{
+          align-self: center;
+        }
+
+        .parameters__div:not(:first-of-type){
+          border:none;
+      }
+
+        .parameters__title{
+          text-align: center;
+        }
+
+        .locations{
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <section class="search">
+        <h1>IP Address Tracker</h1>
+        <div class="search__input">
+          <input
+            type="text"
+            placeholder="  Search for any IP address or domain"
+          />
+          <button class="search__button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="14">
+              <path
+                fill="none"
+                stroke="#FFF"
+                stroke-width="3"
+                d="M2 1l6 6-6 6"
+              />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <section class="parameters">
+        <div class="parameters__wrapper">
+          <div class="parameters__div">
+            <h2 class="parameters__title">IP ADDRESS</h2>
+            <p class="parameters__text"></p>
+          </div>
+          <div class="parameters__div">
+            <h2 class="parameters__title">LOCATION</h2>
+            <p class="parameters__text locations"></p>
+          </div>
+          <div class="parameters__div">
+            <h2 class="parameters__title">TIMEZONE</h2>
+            <p class="parameters__text"></p>
+          </div>
+          <div class="parameters__div">
+            <h2 class="parameters__title">ISP</h2>
+            <p class="parameters__text"></p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="index.js"></script>
+  </body>
+</html>
